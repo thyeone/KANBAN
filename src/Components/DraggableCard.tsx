@@ -27,7 +27,7 @@ function DraggableCard({ toDoId, index, toDoText }: IDraggableCardProps) {
 
 const Card = styled.div<{ isDragging: boolean }>`
   background-color: ${(props) =>
-    props.isDragging ? "tomato" : props.theme.cardColor};
+    props.isDragging ? props.theme.isDragging : props.theme.cardColor};
   box-shadow: ${(props) =>
     props.isDragging ? "0 2px 5px rgba(0,0,0,0.5)" : "none"};
   border-radius: 5px;

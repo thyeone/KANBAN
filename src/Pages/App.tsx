@@ -1,15 +1,31 @@
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useRecoilState } from "recoil";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { IToDo, toDoState } from "./atoms";
-import Board from "./Components/Board";
+import { boardState, deleteState, toDoState } from "../atoms";
+import Board from "../Components/Board";
+import CreateBoard from "../Components/CreateBoard";
+import TrashCan from "../Components/TrashCan";
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [boards, setBoards] = useRecoilState(boardState);
+  const trashCan = useSetRecoilState(deleteState);
+
   const onDragEnd = (info: DropResult) => {
     console.log(info);
-    const { destination, draggableId, source } = info;
+    const { destination, source } = info;
     if (!destination) return;
+    trashCan(true);
+    if (source.droppableId === "boards") {
+      setBoards((prev) => {
+        const boardCopy = [...prev];
+        const item = boardCopy[source.index];
+        boardCopy.splice(source.index, 1); // 지우고
+        boardCopy.splice(destination.index, 0, item); // 도착지의 인덱스에 item을 추가
+        return boardCopy;
+      });
+    }
     if (destination?.droppableId === source.droppableId) {
       // same board movement.
       setToDos((allBoards) => {
@@ -41,12 +57,23 @@ function App() {
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <CreateBoard setToDos={setToDos} setBoards={setBoards} />
       <Wrapper>
-        <Boards>
-          {Object.keys(toDos).map((boardId) => (
-            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
-          ))}
-        </Boards>
+        <Droppable droppableId="boards" direction="horizontal" type="board">
+          {(magic) => (
+            <Boards ref={magic.innerRef} {...magic.droppableProps}>
+              {boards.map((boardId, idx) => (
+                <Board
+                  key={idx}
+                  boardId={boardId}
+                  toDos={toDos[boardId]}
+                  idx={idx}
+                />
+              ))}
+            </Boards>
+          )}
+        </Droppable>
+        <TrashCan />
       </Wrapper>
     </DragDropContext>
   );
@@ -54,18 +81,15 @@ function App() {
 
 const Wrapper = styled.div`
   display: flex;
-  max-width: 680px;
-  width: 100%;
-  margin: 0 auto;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100vh;
 `;
 
 const Boards = styled.div`
   display: grid;
   gap: 20px;
-  width: 100%;
   grid-template-columns: repeat(3, 1fr);
 `;
 

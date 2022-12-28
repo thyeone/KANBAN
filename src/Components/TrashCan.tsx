@@ -1,0 +1,38 @@
+import { Droppable } from "react-beautiful-dnd";
+import { useRecoilValue } from "recoil";
+import styled from "styled-components";
+import trashcan from "../assets/trashcan.svg";
+import { deleteState } from "../atoms";
+
+const TrashCan = () => {
+  const trashCanState = useRecoilValue(deleteState);
+
+  return (
+    <Droppable droppableId="trashcan">
+      {(magic) => (
+        <Wrapper ref={magic.innerRef} {...magic.droppableProps}>
+          <TrashCanImg />
+        </Wrapper>
+      )}
+    </Droppable>
+  );
+};
+
+const Wrapper = styled.div`
+  width: 300px;
+  max-height: 50px;
+  background-color: #dadfe9;
+  border-radius: 8px;
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0.5px 0.5px 0px 0.5px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
+`;
+
+const TrashCanImg = styled.img.attrs({
+  src: `${trashcan}`,
+})``;
+
+export default TrashCan;
