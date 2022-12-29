@@ -3,8 +3,9 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { IToDo, toDoState } from "../atoms";
+import { boardState, IToDo, toDoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
+import CloseIcon from "@mui/icons-material/Close";
 
 export interface IBoardProps {
   toDos: IToDo[];
@@ -23,6 +24,7 @@ interface IAreaProps {
 
 function Board({ toDos, boardId, idx }: IBoardProps) {
   const setToDos = useSetRecoilState(toDoState);
+  const setBoards = useSetRecoilState(boardState);
   const { register, setValue, handleSubmit } = useForm<IToDoForm>();
   const onValid = ({ toDo }: IToDoForm) => {
     const newToDo = { id: Date.now(), text: toDo };
@@ -32,6 +34,13 @@ function Board({ toDos, boardId, idx }: IBoardProps) {
     });
     setValue("toDo", "");
   };
+  const DeleteBoard = () => {
+    setBoards((prev) => {
+      const allBoards = [...prev];
+      allBoards.splice(idx, 1);
+      return allBoards;
+    });
+  };
   return (
     <Draggable draggableId={boardId} index={idx} key={boardId}>
       {(magic) => (
@@ -40,7 +49,13 @@ function Board({ toDos, boardId, idx }: IBoardProps) {
           {...magic.dragHandleProps}
           {...magic.draggableProps}
         >
-          <Title>{boardId}</Title>
+          <Title>
+            {boardId}
+            <span />
+            <button className="board-delete" onClick={DeleteBoard}>
+              <CloseIcon />
+            </button>
+          </Title>
           <Form onSubmit={handleSubmit(onValid)}>
             <input
               {...register("toDo", { required: true })}
@@ -49,10 +64,10 @@ function Board({ toDos, boardId, idx }: IBoardProps) {
             />
           </Form>
           <Droppable droppableId={boardId}>
-            {(magic, info) => (
+            {(magic, snapshot) => (
               <Area
-                isDraggingOver={info.isDraggingOver}
-                isDraggingFromThisWith={Boolean(info.draggingFromThisWith)}
+                isDraggingOver={snapshot.isDraggingOver}
+                isDraggingFromThisWith={Boolean(snapshot.draggingFromThisWith)}
                 ref={magic.innerRef}
                 {...magic.droppableProps}
               >
@@ -71,36 +86,6 @@ function Board({ toDos, boardId, idx }: IBoardProps) {
         </Wrapper>
       )}
     </Draggable>
-    /*     <Wrapper>
-      <Title>{boardId}</Title>
-      <Form onSubmit={handleSubmit(onValid)}>
-        <input
-          {...register("toDo", { required: true })}
-          type="text"
-          placeholder={`Add task on ${boardId}`}
-        />
-      </Form>
-      <Droppable droppableId={boardId}>
-        {(magic, info) => (
-          <Area
-            isDraggingOver={info.isDraggingOver}
-            isDraggingFromThisWith={Boolean(info.draggingFromThisWith)}
-            ref={magic.innerRef}
-            {...magic.droppableProps}
-          >
-            {toDos.map((toDo, idx) => (
-              <DraggableCard
-                key={toDo.id}
-                index={idx}
-                toDoId={toDo.id}
-                toDoText={toDo.text}
-              />
-            ))}
-            {magic.placeholder}
-          </Area>
-        )}
-      </Droppable>
-    </Wrapper> */
   );
 }
 
@@ -130,8 +115,25 @@ const Wrapper = styled.div`
 const Title = styled.h2`
   text-align: center;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin: 10px 0;
   font-size: 18px;
+  line-height: 27px;
+
+  .board-delete {
+    position: absolute;
+    margin-left: 50px;
+    opacity: 0;
+    color: ${(props) => props.theme.textColor};
+    transition: opacity 0.2s;
+    border: 0;
+    background-color: transparent;
+  }
+  &:hover .board-delete {
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+  }
 `;
 
 const Form = styled.form`
