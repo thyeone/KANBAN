@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { SetterOrUpdater } from "recoil";
 import styled from "styled-components";
-import { IToDo, IToDoState } from "../atoms";
+import { IToDoState } from "../atoms";
 
 interface IBoardForm {
   newBoard: string;

@@ -1,12 +1,8 @@
 import { Droppable } from "react-beautiful-dnd";
-import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import trashcan from "../assets/trashcan.svg";
-import { deleteState } from "../atoms";
 
 const TrashCan = () => {
-  const trashCanState = useRecoilValue(deleteState);
-
   return (
     <Droppable droppableId="trashcan">
       {(magic) => (
@@ -29,6 +25,10 @@ const Wrapper = styled.div`
   align-items: center;
   box-shadow: 0.5px 0.5px 0px 0.5px rgba(0, 0, 0, 0.2);
   margin-top: 20px;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.147);
+    transition: all 0.5s ease;
+  }
 `;
 
 const TrashCanImg = styled.img.attrs({
