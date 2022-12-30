@@ -121,7 +121,7 @@ const Title = styled.h2`
 
   .board-delete {
     position: absolute;
-    margin-left: 50px;
+    margin-left: 80px;
     opacity: 0;
     color: ${(props) => props.theme.textColor};
     transition: opacity 0.2s;
