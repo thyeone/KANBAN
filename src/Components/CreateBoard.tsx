@@ -40,7 +40,7 @@ const Form = styled.form`
   justify-content: center;
   margin-top: 10px;
   input {
-    width: 50%;
+    width: 25%;
     height: 34px;
     border: none;
     background-color: ${(props) => props.theme.cardColor};
